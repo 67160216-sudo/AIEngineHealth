@@ -1,7 +1,4 @@
 My FastAPI Project
-
-โปรเจกต์ Web Application สำหรับระบบ AI Engine Health Prediction พัฒนาด้วย FastAPI โดยมีระบบจัดการผู้ใช้งานและหน้าสำหรับทำนายสุขภาพเครื่องยนต์
-
 📁 Project Structure
 my-fastapi-project/
 │
@@ -31,31 +28,32 @@ docker-compose.yml	ใช้สำหรับจัดการและรั�
 1. Clone Repository
 git clone <repository-url>
 cd my-fastapi-project
-2. ติดตั้ง Dependencies
+2. Install Dependencies
 pip install -r requirements.txt
 3. Run FastAPI
 uvicorn app.main:app --reload
 
-จากนั้นเปิดเว็บไซต์:
+เปิด Browser แล้วเข้า:
 
 http://127.0.0.1:8000
 🐳 Run with Docker
-
-สามารถรันโปรเจกต์ด้วย Docker Compose ได้ด้วยคำสั่ง:
-
 docker compose up --build
 
-เมื่อ Container ทำงานแล้ว สามารถเข้าใช้งานผ่าน:
+จากนั้นเข้า:
 
 http://localhost:8000
 📖 API Documentation
 
-FastAPI จะสร้าง API Documentation ให้อัตโนมัติ
+FastAPI มี API Documentation ให้อัตโนมัติ
 
 Swagger UI
+
 http://localhost:8000/docs
+
 ReDoc
+
 http://localhost:8000/redoc
+
 ✨ Features
 🔐 User Login
 📝 User Registration
@@ -67,7 +65,6 @@ http://localhost:8000/redoc
 🛠️ Technologies
 Python
 FastAPI
-REST API
 HTML / CSS / JavaScript
 Machine Learning
 Docker
