@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  course-api:
+    build: .
+    container_name: course-api-container
+    ports:
+      - "8000:8000"
+    restart: always
