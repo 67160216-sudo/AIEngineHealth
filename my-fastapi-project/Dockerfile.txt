@@ -1,0 +1,18 @@
+# 1. ใช้ Python 3.10 เป็น Base Image
+FROM python:3.10-slim
+
+# 2. ตั้งค่า Working Directory ใน Container
+WORKDIR /app
+
+# 3. ก๊อปปี้ไฟล์ requirements.txt และติดตั้งแพ็กเกจ
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 4. ก๊อปปี้ โค้ดทั้งหมดเข้า Container
+COPY . .
+
+# 5. เปิด Port 8000
+EXPOSE 8000
+
+# 6. คำสั่งสั่งให้ uvicorn รัน FastAPI บน port 8000
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
