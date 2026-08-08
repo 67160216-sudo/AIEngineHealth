@@ -15,7 +15,11 @@ db_users = [
     {"id": 1, "username": "somchai", "email": "somchai@example.com", "full_name": "สมชาย สุขใจ", "password": "password123"},
     {"id": 2, "username": "saree", "email": "saree@example.com", "full_name": "สารี มั่นคง", "password": "password456"}
 ]
+app = FastAPI(title="AI Engine Health Prediction API")
 
+# <-- เพิ่ม 2 บรรทัดนี้ไว้หลังสร้างตัวแปร app (เพื่อให้เปิดหน้าเว็บ HTML ผ่าน Docker ได้)
+if os.path.exists("app/static"):
+    app.mount("/web", StaticFiles(directory="app/static", html=True), name="static")
 # ==========================================
 # Pydantic Schemas
 # ==========================================
