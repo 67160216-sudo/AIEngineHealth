@@ -1,3 +1,4 @@
+import os  # <-- เพิ่มบรรทัดนี้ไว้บนสุด
 from fastapi import FastAPI, HTTPException, status, Query
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
