@@ -43,3 +43,25 @@ my-fastapi-project/
 ├── docker-compose.yml       # ไฟล์จัดการ Container Service
 ├── requirements.txt         # รายชื่อ Python Packages ที่ต้องใช้
 └── README.md                # เอกสารอธิบายการใช้งานโปรเจกต์
+
+
+
+
+
+
+
+
+
+สั่งรันด้วย Docker CLI (ตามขั้นตอนในสไลด์)
+Build Docker Image:
+
+Bash
+docker build -t course-api .
+Run Docker Container:
+
+Bash
+docker run -d -p 8000:8000 --name course-api-container course-api
+หยุดการทำงานและลบ Container:
+
+Bash
+docker rm -f course-api-container
