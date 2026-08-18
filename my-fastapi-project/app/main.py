@@ -1,76 +1,67 @@
-import os  # <-- เพิ่มบรรทัดนี้ไว้บนสุด
-from fastapi import FastAPI, HTTPException, status, Query
+import os
+from fastapi import FastAPI, HTTPException, status, Depends
+from fastapi.staticfiles import StaticFiles
+from sqlalchemy.orm import Session
+from passlib.context import CryptContext
+
+from app.database import engine, get_db, Base
+from app import models
 from pydantic import BaseModel, EmailStr
-from typing import Optional, List
 
-app = FastAPI(
-    title="AI Engine Health Prediction API",
-    description="REST API สำหรับระบบทำนายสุขภาพเครื่องยนต์และจัดการผู้ใช้งาน",
-    version="1.0.0"
-)
+# สร้างตารางในฐานข้อมูลอัตโนมัติหากยังไม่มี
+models.Base.metadata.create_all(bind=engine)
 
-# ==========================================
-# Mock Database (ฐานข้อมูลจำลองในหน่วยความจำ)
-# ==========================================
-db_users = [
-    {"id": 1, "username": "somchai", "email": "somchai@example.com", "full_name": "สมชาย สุขใจ", "password": "password123"},
-    {"id": 2, "username": "saree", "email": "saree@example.com", "full_name": "สารี มั่นคง", "password": "password456"}
-]
 app = FastAPI(title="AI Engine Health Prediction API")
 
-# <-- เพิ่ม 2 บรรทัดนี้ไว้หลังสร้างตัวแปร app (เพื่อให้เปิดหน้าเว็บ HTML ผ่าน Docker ได้)
+# Mount หน้าเว็บ HTML
 if os.path.exists("app/static"):
     app.mount("/web", StaticFiles(directory="app/static", html=True), name="static")
-# ==========================================
-# Pydantic Schemas
-# ==========================================
+
+# ตัวเข้ารหัส Password (เพื่อความปลอดภัย ไม่ควรบันทึก Plain Password ลง DB)
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# Schema สำหรับรับข้อมูลสมัครสมาชิก
 class RegisterSchema(BaseModel):
     username: str
     email: EmailStr
     full_name: str
     password: str
 
-class LoginSchema(BaseModel):
-    username: str
-    password: str
+# ฟังก์ชันเข้ารหัสผ่าน
+def get_password_hash(password: str) -> str:
+    return pwd_context.hash(password)
 
-class PasswordChangeSchema(BaseModel):
-    old_password: str
-    new_password: str
+# Endpoint สมัครสมาชิก (Register)
+@app.post("/register", status_code=status.HTTP_201_CREATED, tags=["Authentication"])
+def register(user_data: RegisterSchema, db: Session = Depends(get_db)):
+    # 1. ตรวจสอบว่า Username หรือ Email ซ้ำหรือไม่
+    existing_username = db.query(models.User).filter(models.User.username == user_data.username).first()
+    if existing_username:
+        raise HTTPException(status_code=400, detail="Username นี้ถูกใช้งานแล้ว")
+        
+    existing_email = db.query(models.User).filter(models.User.email == user_data.email).first()
+    if existing_email:
+        raise HTTPException(status_code=400, detail="Email นี้ถูกใช้งานแล้ว")
 
-class UserUpdateSchema(BaseModel):
-    full_name: Optional[str] = None
-    email: Optional[EmailStr] = None
+    # 2. เข้ารหัส Password
+    hashed_pwd = get_password_hash(user_data.password)
 
-class UserResponse(BaseModel):
-    id: int
-    username: str
-    email: str
-    full_name: str
+    # 3. บันทึกลงฐานข้อมูลจริง
+    new_user = models.User(
+        username=user_data.username,
+        email=user_data.email,
+        full_name=user_data.full_name,
+        password_hash=hashed_pwd
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
 
-class PredictionRequestSchema(BaseModel):
-    coolant_temp: float
-    battery_voltage: float
-    rpm: int
-
-# ==========================================
-# 1. Authentication Endpoints
-# ==========================================
-@app.post("/register", status_code=status.HTTP_201_CREATED, tags=["1. Authentication"])
-def register(user: RegisterSchema):
-    for u in db_users:
-        if u["username"] == user.username:
-            raise HTTPException(status_code=400, detail="Username นี้ถูกใช้งานแล้ว")
-    
-    new_user = {
-        "id": len(db_users) + 1,
-        "username": user.username,
-        "email": user.email,
-        "full_name": user.full_name,
-        "password": user.password
+    return {
+        "message": "ลงทะเบียนสำเร็จ",
+        "user_id": new_user.id,
+        "username": new_user.username
     }
-    db_users.append(new_user)
-    return {"message": "สมัครสมาชิกสำเร็จ", "user_id": new_user["id"]}
 
 @app.post("/login", tags=["1. Authentication"])
 def login(credentials: LoginSchema):
