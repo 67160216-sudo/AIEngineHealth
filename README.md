@@ -34,15 +34,13 @@
 ```text
 my-fastapi-project/
 ├── app/
-│   ├── main.py              # โค้ดหลักของ FastAPI และ REST API Endpoints
-│   └── static/              # หน้าเว็บ UI (HTML/CSS/JS)
-│       ├── login.html       # หน้าเข้าสู่ระบบ
-│       ├── register.html    # หน้าสมัครสมาชิก
-│       └── prediction.html  # หน้าทำนายผล AI & Sensor Simulator
-├── Dockerfile               # ไฟล์กำหนดการสร้าง Container Image (Python 3.10)
-├── docker-compose.yml       # ไฟล์จัดการ Container Service
-├── requirements.txt         # รายชื่อ Python Packages ที่ต้องใช้
-└── README.md                # เอกสารอธิบายการใช้งานโปรเจกต์
+│   ├── main.py
+│   ├── database.py
+│   ├── models.py
+│   └── static/
+├── Dockerfile
+├── docker-compose.yml
+└── requirements.txt
 
 
 
