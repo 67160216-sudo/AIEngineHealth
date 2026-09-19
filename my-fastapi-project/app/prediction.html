@@ -3,261 +3,404 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>หน้าทำนายผล - AI Engine Health</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>ระบบประวัติและการทำนาย RUL เครื่องยนต์ (ECU AI-RUL)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Prompt) -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        :root {
-            --primary: #2563eb;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --border: #334155;
-            --text: #f8fafc;
-            --text-muted: #94a3b8;
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text); line-height: 1.6; padding-bottom: 50px; }
-        .navbar { background-color: var(--card-bg); border-bottom: 1px solid var(--border); padding: 15px 20px; }
-        .nav-container { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-weight: 700; font-size: 1.25rem; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 8px; }
-        .logo span { color: var(--primary); }
-        .nav-links a { color: var(--text-muted); text-decoration: none; padding: 6px 12px; border-radius: 6px; font-size: 0.9rem; margin-left: 10px; }
-        .nav-links a.active { background-color: var(--primary); color: #fff; }
-
-        .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
-        @media (max-width: 850px) { .container { grid-template-columns: 1fr; } }
-
-        .card { background-color: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 25px; }
-        .card-title { font-size: 1.2rem; margin-bottom: 15px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-
-        /* Simulator Preset Buttons */
-        .simulator-box { background-color: rgba(255,255,255,0.02); border: 1px dashed var(--border); border-radius: 12px; padding: 15px; margin-bottom: 20px; }
-        .simulator-title { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px; font-weight: 600; display: flex; justify-content: space-between; }
-        .preset-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .preset-btn { padding: 10px; border-radius: 8px; border: 1px solid var(--border); background-color: #0f172a; color: #fff; font-size: 0.8rem; cursor: pointer; text-align: center; transition: all 0.2s; }
-        .preset-btn:hover { border-color: var(--primary); }
-        .preset-btn.normal { border-left: 4px solid var(--success); }
-        .preset-btn.warning { border-left: 4px solid var(--warning); }
-        .preset-btn.danger { border-left: 4px solid var(--danger); }
-
-        /* Manual Input & File Upload */
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; }
-        .form-group input { width: 100%; padding: 10px; background-color: #0f172a; border: 1px solid var(--border); border-radius: 8px; color: #fff; font-size: 0.95rem; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-
-        .file-upload-box { border: 1px dashed var(--border); padding: 15px; border-radius: 8px; text-align: center; background-color: rgba(0,0,0,0.2); }
-        .file-upload-box input { display: none; }
-        .file-upload-label { cursor: pointer; font-size: 0.85rem; color: var(--primary); }
-
-        .btn-analyze { width: 100%; padding: 12px; background-color: var(--primary); color: #fff; border: none; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 15px; }
-        .btn-analyze:hover { background-color: #1d4ed8; }
-
-        /* Dashboard Output Result */
-        .result-status { padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; font-weight: 700; font-size: 1.1rem; }
-        .status-good { background-color: rgba(16, 185, 129, 0.15); border: 1px solid var(--success); color: var(--success); }
-        .status-danger { background-color: rgba(239, 68, 68, 0.15); border: 1px solid var(--danger); color: var(--danger); }
-        .status-warning { background-color: rgba(245, 158, 11, 0.15); border: 1px solid var(--warning); color: var(--warning); }
-
-        .metric-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-        .metric-row:last-child { border-bottom: none; }
-        .badge { padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
     </style>
 </head>
-<body>
+<body class="flex h-screen overflow-hidden">
 
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="#" class="logo"><i class="fas fa-brain"></i> AI <span>Engine Health</span></a>
-            <div class="nav-links">
-                <a href="login.html">ออกจากระบบ</a>
-                <a href="prediction.html" class="active">วิเคราะห์สุขภาพรถ</a>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container">
-        
-        <!-- ฝั่งที่ 1: ป้อนข้อมูลเซนเซอร์ (Input Panel) -->
-        <div class="card">
-            <div class="card-title"><i class="fas fa-sliders-h" style="color: var(--primary);"></i> ป้อนข้อมูลค่าเซนเซอร์</div>
-
-            <!-- 2. ปุ่มจำลองสถานการณ์ (Sensor Simulator) -->
-            <div class="simulator-box">
-                <div class="simulator-title">
-                    <span><i class="fas fa-gamepad"></i> จำลองสถานการณ์ (Sensor Simulator)</span>
-                    <span style="font-size: 0.75rem; color: var(--primary);">คลิกทดสอบได้ทันที</span>
-                </div>
-                <div class="preset-btns">
-                    <button class="preset-btn normal" onclick="loadPreset('normal')">🟢 รถปกติ</button>
-                    <button class="preset-btn warning" onclick="loadPreset('warning')">🟡 เฝ้าระวัง</button>
-                    <button class="preset-btn danger" onclick="loadPreset('danger')">🔴 เครื่องเสี่ยงพัง</button>
-                </div>
+    <!-- 1. Sidebar Navigation (แถบเมนูด้านซ้าย) -->
+    <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between hidden md:flex">
+        <div>
+            <!-- Logo -->
+            <div class="h-16 flex items-center px-6 gap-3 border-b border-slate-800">
+                <i class="fa-solid fa-microchip text-indigo-500 text-2xl"></i>
+                <span class="font-bold text-lg tracking-wide text-white">ECU AI-RUL</span>
             </div>
 
-            <!-- 1. ฟอร์มกรอกค่าด้วยตนเอง (Manual Entry) -->
-            <form id="sensorForm" onsubmit="event.preventDefault(); runPrediction();">
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>อุณหภูมิหม้อน้ำ (°C)</label>
-                        <input type="number" id="coolant" value="85" required>
-                    </div>
-                    <div class="form-group">
-                        <label>แรงดันแบตเตอรี่ (V)</label>
-                        <input type="number" step="0.1" id="voltage" value="13.8" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>รอบเครื่องยนต์ (RPM)</label>
-                    <input type="number" id="rpm" value="1800" required>
-                </div>
-
-                <!-- 3. อัปโหลดไฟล์ Log (CSV Upload) -->
-                <div class="form-group">
-                    <label>หรือนำเข้าข้อมูลด้วยไฟล์ Log (CSV / JSON)</label>
-                    <div class="file-upload-box">
-                        <i class="fas fa-file-csv" style="font-size: 1.5rem; color: var(--text-muted); margin-bottom: 5px;"></i><br>
-                        <label for="csvFile" class="file-upload-label">คลิกเพื่ออัปโหลดไฟล์ log_sensor.csv</label>
-                        <input type="file" id="csvFile" accept=".csv, .json" onchange="handleFileUpload(event)">
-                        <div id="fileNameDisplay" style="font-size: 0.75rem; color: var(--success); margin-top: 5px;"></div>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-analyze"><i class="fas fa-brain"></i> ประมวลผลและทำนายด้วย AI</button>
-            </form>
+            <!-- Navigation Links -->
+            <nav class="p-4 space-y-1">
+                <button onclick="switchTab('history')" id="nav-history" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl bg-indigo-600 text-white transition">
+                    <i class="fa-solid fa-clock-rotate-left w-5"></i>
+                    <span>ประวัติการทำนาย</span>
+                </button>
+                <button onclick="switchTab('prediction')" id="nav-prediction" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-wand-magic-sparkles w-5"></i>
+                    <span>ทำนาย RUL (5 ค่า ECU)</span>
+                </button>
+                <button onclick="switchTab('alerts')" id="nav-alerts" class="nav-btn w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition">
+                    <i class="fa-solid fa-bell w-5"></i>
+                    <span>ศูนย์แจ้งเตือน</span>
+                    <span id="alert-badge" class="ml-auto bg-rose-500/20 text-rose-400 text-xs px-2 py-0.5 rounded-full font-bold">1</span>
+                </button>
+            </nav>
         </div>
 
-        <!-- ฝั่งที่ 2: หน้าผลการวิเคราะห์ AI (Output Dashboard) -->
-        <div class="card">
-            <div class="card-title"><i class="fas fa-chart-line" style="color: var(--primary);"></i> ผลการวิเคราะห์จากระบบ AI</div>
-
-            <!-- กล่องแสดงสถานะรวม -->
-            <div id="resultStatusBox" class="result-status status-good">
-                <i class="fas fa-check-circle"></i> เครื่องยนต์ทำงานปกติ (ความเสี่ยง 12%)
+        <!-- User Profile (ล่างสุด) -->
+        <div class="p-4 border-t border-slate-800 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold border border-indigo-500/30">
+                วิ
             </div>
-
-            <!-- รายละเอียดการทำนาย 4 หัวข้อ -->
-            <div class="metric-row">
-                <span><i class="fas fa-clock"></i> โอกาสเครื่องยนต์เสียใน 30 วัน:</span>
-                <span id="riskValue" style="font-weight: bold; color: var(--success);">ต่ำ (12%)</span>
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-white truncate">วิศวกรดูแลระบบ</p>
+                <p class="text-xs text-slate-400 truncate">admin@telematics.co.th</p>
             </div>
-            <div class="metric-row">
-                <span><i class="fas fa-hourglass-half"></i> อายุการใช้งานที่เหลือ (RUL):</span>
-                <span id="rulValue" style="font-weight: bold;">ประมาณ 180 วัน (~9,000 กม.)</span>
-            </div>
-            <div class="metric-row">
-                <span><i class="fas fa-exclamation-triangle"></i> ชิ้นส่วนที่มีแนวโน้มเสียก่อน:</span>
-                <span id="partValue" class="badge" style="background-color: rgba(16, 185, 129, 0.2); color: var(--success);">ไม่มี (ปกติทุกชิ้นส่วน)</span>
-            </div>
-            <div class="metric-row">
-                <span><i class="fas fa-wrench"></i> คำแนะนำการซ่อมบำรุง:</span>
-                <span id="recommendValue" style="color: var(--text-muted);">เข้าตรวจเช็กตามระยะปกติ</span>
-            </div>
-
-            <div style="margin-top: 25px; padding: 12px; background-color: rgba(255,255,255,0.02); border-radius: 8px; font-size: 0.8rem; color: var(--text-muted);">
-                <i class="fas fa-info-circle"></i> <strong>หมายเหตุ:</strong> ระบบใช้โมเดล Machine Learning ในการประมวลผลความสัมพันธ์ระหว่างความร้อน แรงดันไฟ และรอบเครื่องยนต์แบบ Real-time
-            </div>
+            <button class="text-slate-500 hover:text-red-400 transition" title="ออกจากระบบ">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
         </div>
+    </aside>
 
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+
+        <!-- Top Header -->
+        <header class="h-16 bg-slate-900/50 border-b border-slate-800 flex items-center justify-between px-6">
+            <div class="flex items-center gap-3">
+                <h1 id="page-title" class="text-lg font-bold text-white">ประวัติการทำนายสุขภาพเครื่องยนต์ย้อนหลัง</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <!-- CTA Button สั่งทำนายใหม่ -->
+                <button onclick="switchTab('prediction')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-xl transition shadow-lg shadow-indigo-600/30 flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>ทำนาย RUL ค่าใหม่</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dynamic Body Content -->
+        <main class="flex-1 overflow-y-auto p-6 space-y-6">
+
+            <!-- TAB 1: HISTORY LOG (หน้าแรกหลักหลัง Login) -->
+            <div id="tab-history" class="tab-content space-y-6">
+                
+                <!-- KPI Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="glass-card p-5 rounded-2xl">
+                        <p class="text-xs text-slate-400 font-medium">บันทึกทั้งหมดของคุณ</p>
+                        <h3 id="stat-total" class="text-2xl font-bold text-white mt-1">3 รายการ</h3>
+                    </div>
+                    <div class="glass-card p-5 rounded-2xl">
+                        <p class="text-xs text-slate-400 font-medium">สถานะปกติ (🟢)</p>
+                        <h3 id="stat-normal" class="text-2xl font-bold text-emerald-400 mt-1">1 รายการ</h3>
+                    </div>
+                    <div class="glass-card p-5 rounded-2xl">
+                        <p class="text-xs text-slate-400 font-medium">ควรเฝ้าระวัง (🟡)</p>
+                        <h3 id="stat-warning" class="text-2xl font-bold text-amber-400 mt-1">1 รายการ</h3>
+                    </div>
+                    <div class="glass-card p-5 rounded-2xl">
+                        <p class="text-xs text-slate-400 font-medium">เสี่ยงวิกฤต (🔴)</p>
+                        <h3 id="stat-danger" class="text-2xl font-bold text-rose-500 mt-1">1 รายการ</h3>
+                    </div>
+                </div>
+
+                <!-- History Table -->
+                <div class="glass-card rounded-2xl overflow-hidden">
+                    <div class="p-5 border-b border-slate-800 flex justify-between items-center">
+                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-indigo-400"></i>
+                            รายการประวัติการวิเคราะห์ล่าสุด
+                        </h3>
+                        <span class="text-xs text-slate-400">อัปเดตล่าสุด: สตรีมเรียลไทม์</span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="bg-slate-800/80 text-slate-400 uppercase tracking-wider">
+                                <tr>
+                                    <th class="p-4">วัน-เวลา บันทึก</th>
+                                    <th class="p-4">ชื่อคัน / อุปกรณ์</th>
+                                    <th class="p-4">ค่า ECU (ความร้อน/แรงดัน/รอบ)</th>
+                                    <th class="p-4">ผลทำนาย RUL</th>
+                                    <th class="p-4">สถานะความเสี่ยง</th>
+                                    <th class="p-4 text-center">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body" class="divide-y divide-slate-800">
+                                <!-- Data rows generated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: AI PREDICTION (หน้ากรอก 5 ค่า ECU) -->
+            <div id="tab-prediction" class="tab-content hidden space-y-6">
+                <div class="max-w-3xl mx-auto glass-card p-6 md:p-8 rounded-2xl space-y-6">
+                    <div class="border-b border-slate-800 pb-4 flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-sliders text-indigo-400"></i>
+                                ป้อนค่าจากกล่อง ECU (5 เซ็นเซอร์หลัก)
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-1">กรอกข้อมูลเพื่อประเมินเวลาที่เหลือก่อนเครื่องยนต์สุ่มเสี่ยงพังเสียหาย</p>
+                        </div>
+                        <button onclick="switchTab('history')" class="text-slate-400 hover:text-white text-xs">
+                            <i class="fa-solid fa-xmark text-lg"></i>
+                        </button>
+                    </div>
+
+                    <form id="ecu-form" class="space-y-5" onsubmit="handlePredictionSubmit(event)">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">ชื่อเรียก หรือ ทะเบียนรถ</label>
+                            <input type="text" id="input-name" placeholder="เช่น รถบรรทุก A-01 หรือ ทะเบียน 7กข-8921" required class="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">1. อุณหภูมิเครื่องยนต์ (°C)</label>
+                                <input type="number" id="input-temp" value="92" min="50" max="130" required class="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+                                <span class="text-[10px] text-slate-500">ช่วงปกติ: 85 - 105 °C</span>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">2. แรงดันน้ำมันเครื่อง (PSI)</label>
+                                <input type="number" id="input-oil" value="45" min="0" max="100" required class="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+                                <span class="text-[10px] text-slate-500">ช่วงปกติ: 30 - 60 PSI</span>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">3. รอบเครื่องยนต์ (RPM)</label>
+                                <input type="number" id="input-rpm" value="2100" min="0" max="8000" required class="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+                                <span class="text-[10px] text-slate-500">ช่วงปกติ: 800 - 3,500 RPM</span>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">4. แรงดันไฟฟ้าแบตเตอรี่ (V)</label>
+                                <input type="number" step="0.1" id="input-volt" value="13.8" min="8" max="18" required class="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+                                <span class="text-[10px] text-slate-500">ช่วงปกติ: 13.5 - 14.5 V</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">5. ภาระโหลดเครื่องยนต์ Engine Load (%)</label>
+                            <input type="number" id="input-load" value="40" min="0" max="100" required class="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+                            <span class="text-[10px] text-slate-500">ช่วงปกติ: 20% - 80%</span>
+                        </div>
+
+                        <div class="pt-4 flex gap-3">
+                            <button type="button" onclick="switchTab('history')" class="w-1/3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 rounded-xl transition">
+                                ยกเลิก
+                            </button>
+                            <button type="submit" class="w-2/3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-brain"></i>
+                                <span>คำนวณ & บันทึกประวัติทันที</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- TAB 3: ALERTS -->
+            <div id="tab-alerts" class="tab-content hidden space-y-4">
+                <div class="glass-card p-6 rounded-2xl">
+                    <h3 class="text-md font-bold text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-bell text-rose-500"></i> รายการแจ้งเตือนระดับวิกฤต
+                    </h3>
+                    <div id="alerts-container" class="space-y-3">
+                        <!-- Alert items dynamically injected -->
+                    </div>
+                </div>
+            </div>
+
+        </main>
     </div>
 
-    <!-- JavaScript สลับสถานการณ์และทำนายผล -->
+    <!-- Script ควบคุม Logic และ Workflow ทั้งหมด -->
     <script>
-        // 1. ฟังก์ชันสลับสถานการณ์จำลอง (Sensor Simulator Preset)
-        function loadPreset(type) {
-            if(type === 'normal') {
-                document.getElementById('coolant').value = 85;
-                document.getElementById('voltage').value = 13.8;
-                document.getElementById('rpm').value = 1800;
-            } else if(type === 'warning') {
-                document.getElementById('coolant').value = 96;
-                document.getElementById('voltage').value = 12.1;
-                document.getElementById('rpm').value = 2800;
-            } else if(type === 'danger') {
-                document.getElementById('coolant').value = 108;
-                document.getElementById('voltage').value = 11.2;
-                document.getElementById('rpm').value = 3500;
+        // 1. ข้อมูลจำลองตั้งต้น (Mock Data)
+        let predictionHistory = [
+            { id: 1, date: '19 ก.ย. 2026 14:30', name: 'รถบรรทุก A-01', temp: 92, oil: 45, rpm: 2100, volt: 13.8, load: 40, rulDays: 14.2, rulHours: 340.8, status: 'normal' },
+            { id: 2, date: '18 ก.ย. 2026 10:15', name: 'รถกระบะ B-04', temp: 103, oil: 28, rpm: 3200, volt: 13.2, load: 75, rulDays: 4.5, rulHours: 108.0, status: 'warning' },
+            { id: 3, date: '15 ก.ย. 2026 08:45', name: 'รถบัส C-09', temp: 112, oil: 18, rpm: 3600, volt: 11.5, load: 90, rulDays: 0.6, rulHours: 14.4, status: 'danger' }
+        ];
+
+        // 2. สลับหน้า Tab
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white');
+                btn.classList.add('text-slate-400');
+            });
+
+            const activeBtn = document.getElementById(`nav-${tabName}`);
+            if(activeBtn) {
+                activeBtn.classList.add('bg-indigo-600', 'text-white');
+                activeBtn.classList.remove('text-slate-400');
             }
-            runPrediction(); // สั่งประมวลผลทันทีเมื่อกดเลือก Preset
+
+            const titles = {
+                'history': 'ประวัติการทำนายสุขภาพเครื่องยนต์ย้อนหลัง',
+                'prediction': 'ทำนาย RUL จาก 5 ค่า ECU',
+                'alerts': 'ศูนย์จัดการการแจ้งเตือนความเสี่ยงเครื่องยนต์'
+            };
+            document.getElementById('page-title').innerText = titles[tabName];
         }
 
-        // 2. ฟังก์ชันจำลองอัปโหลดไฟล์ Log
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if(file) {
-                document.getElementById('fileNameDisplay').innerText = "โหลดไฟล์แล้ว: " + file.name;
-                // สุ่มค่าสมมติจากการอ่านไฟล์ CSV
-                document.getElementById('coolant').value = 104;
-                document.getElementById('voltage').value = 11.5;
-                document.getElementById('rpm').value = 3200;
-                runPrediction();
+        // 3. Render ตารางประวัติและปรับสถิติ
+        function renderHistoryTable() {
+            const tbody = document.getElementById('history-table-body');
+            tbody.innerHTML = '';
+
+            let countNormal = 0, countWarning = 0, countDanger = 0;
+
+            predictionHistory.forEach(item => {
+                if (item.status === 'normal') countNormal++;
+                else if (item.status === 'warning') countWarning++;
+                else if (item.status === 'danger') countDanger++;
+
+                let statusBadge = '';
+                if (item.status === 'normal') {
+                    statusBadge = `<span class="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full font-semibold">🟢 ปกติดี</span>`;
+                } else if (item.status === 'warning') {
+                    statusBadge = `<span class="px-2.5 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full font-semibold">🟡 ควรเฝ้าระวัง</span>`;
+                } else {
+                    statusBadge = `<span class="px-2.5 py-1 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-full font-semibold">🔴 วิกฤต</span>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/40 transition';
+                tr.innerHTML = `
+                    <td class="p-4 font-mono text-slate-400">${item.date}</td>
+                    <td class="p-4 font-semibold text-white">${item.name}</td>
+                    <td class="p-4 text-slate-300">${item.temp}°C / ${item.oil} PSI / ${item.rpm} RPM</td>
+                    <td class="p-4 font-bold text-indigo-400">${item.rulDays} วัน <span class="text-slate-500 font-normal">(${item.rulHours} ชม.)</span></td>
+                    <td class="p-4">${statusBadge}</td>
+                    <td class="p-4 text-center">
+                        <button onclick="deleteRecord(${item.id})" class="text-slate-500 hover:text-rose-400 transition" title="ลบบันทึก">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // อัปเดต KPI Cards
+            document.getElementById('stat-total').innerText = `${predictionHistory.length} รายการ`;
+            document.getElementById('stat-normal').innerText = `${countNormal} รายการ`;
+            document.getElementById('stat-warning').innerText = `${countWarning} รายการ`;
+            document.getElementById('stat-danger').innerText = `${countDanger} รายการ`;
+            
+            renderAlerts();
+        }
+
+        // 4. ฟังก์ชันรับค่าจากฟอร์มคำนวณ AI แล้วบันทึกเด้งกลับหน้าแรก
+        function handlePredictionSubmit(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('input-name').value;
+            const temp = parseFloat(document.getElementById('input-temp').value);
+            const oil = parseFloat(document.getElementById('input-oil').value);
+            const rpm = parseFloat(document.getElementById('input-rpm').value);
+            const volt = parseFloat(document.getElementById('input-volt').value);
+            const load = parseFloat(document.getElementById('input-load').value);
+
+            // คำนวณ RUL ด้วย Logic AI Simulation
+            let baseRUL = 20.0;
+            if (temp > 100) baseRUL -= (temp - 100) * 0.8;
+            if (oil < 30) baseRUL -= (30 - oil) * 0.5;
+            if (volt < 12) baseRUL -= 4;
+            if (load > 80) baseRUL -= 3;
+            baseRUL = Math.max(0.2, baseRUL);
+
+            const rulDays = parseFloat(baseRUL.toFixed(1));
+            const rulHours = parseFloat((baseRUL * 24).toFixed(1));
+
+            let status = 'normal';
+            if (rulDays < 2) status = 'danger';
+            else if (rulDays < 7) status = 'warning';
+
+            // ดึงเวลาปัจจุบัน
+            const now = new Date();
+            const dateStr = `${now.getDate()} ก.ย. ${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+            // เพิ่มรายการใหม่ขึ้นบนสุดของ Array
+            predictionHistory.unshift({
+                id: Date.now(),
+                date: dateStr,
+                name: name,
+                temp: temp,
+                oil: oil,
+                rpm: rpm,
+                volt: volt,
+                load: load,
+                rulDays: rulDays,
+                rulHours: rulHours,
+                status: status
+            });
+
+            // ล้างค่าในฟอร์ม
+            document.getElementById('ecu-form').reset();
+
+            // อัปเดตตารางแล้วสลับกลับหน้าประวัติ
+            renderHistoryTable();
+            switchTab('history');
+        }
+
+        // 5. ฟังก์ชันลบรายการ
+        function deleteRecord(id) {
+            if(confirm('คุณต้องการลบรายการประวัตินี้ใช่หรือไม่?')) {
+                predictionHistory = predictionHistory.filter(item => item.id !== id);
+                renderHistoryTable();
             }
         }
 
-        // 3. ฟังก์ชันการทำนายของ AI (Prediction Logic)
-        function runPrediction() {
-            const coolant = parseFloat(document.getElementById('coolant').value);
-            const voltage = parseFloat(document.getElementById('voltage').value);
+        // 6. Render หน้าศูนย์แจ้งเตือน
+        function renderAlerts() {
+            const container = document.getElementById('alerts-container');
+            const alertBadge = document.getElementById('alert-badge');
+            container.innerHTML = '';
 
-            const statusBox = document.getElementById('resultStatusBox');
-            const riskValue = document.getElementById('riskValue');
-            const rulValue = document.getElementById('rulValue');
-            const partValue = document.getElementById('partValue');
-            const recommendValue = document.getElementById('recommendValue');
+            const dangerItems = predictionHistory.filter(item => item.status === 'danger');
+            alertBadge.innerText = dangerItems.length;
 
-            // เงื่อนไขจำลอง AI Decision Tree
-            if (coolant > 100 || voltage < 11.8) {
-                // เคสเสี่ยงพังสูง (Danger)
-                statusBox.className = "result-status status-danger";
-                statusBox.innerHTML = '<i class="fas fa-exclamation-circle"></i> เตือนด่วน! เครื่องยนต์เสี่ยงพังสูง (ความเสี่ยง 88%)';
-                
-                riskValue.innerText = "สูงมาก (88%)";
-                riskValue.style.color = "var(--danger)";
-                rulValue.innerText = "ประมาณ 14 วัน (~600 กม.)";
-                
-                partValue.innerText = "ปั๊มน้ำเสื่อมสภาพ / หม้อน้ำความร้อนสูง";
-                partValue.className = "badge";
-                partValue.style.backgroundColor = "rgba(239, 68, 68, 0.2)";
-                partValue.style.color = "var(--danger)";
-
-                recommendValue.innerText = "ควรนำรถเข้าศูนย์บริการทันทีภายใน 3 วัน";
-            } 
-            else if (coolant > 92 || voltage < 12.3) {
-                // เคสเฝ้าระวัง (Warning)
-                statusBox.className = "result-status status-warning";
-                statusBox.innerHTML = '<i class="fas fa-exclamation-triangle"></i> เฝ้าระวัง! ตรวจพบความผิดปกติเล็กน้อย (ความเสี่ยง 45%)';
-                
-                riskValue.innerText = "ปานกลาง (45%)";
-                riskValue.style.color = "var(--warning)";
-                rulValue.innerText = "ประมาณ 45 วัน (~2,200 กม.)";
-                
-                partValue.innerText = "แบตเตอรี่เริ่มเสื่อม / พัดลมระบายอากาศ";
-                partValue.className = "badge";
-                partValue.style.backgroundColor = "rgba(245, 158, 11, 0.2)";
-                partValue.style.color = "var(--warning)";
-
-                recommendValue.innerText = "ควรนำรถเข้าเช็กสภาพภายใน 2 สัปดาห์";
-            } 
-            else {
-                // เคสปกติ (Normal)
-                statusBox.className = "result-status status-good";
-                statusBox.innerHTML = '<i class="fas fa-check-circle"></i> เครื่องยนต์ทำงานปกติ (ความเสี่ยง 12%)';
-                
-                riskValue.innerText = "ต่ำ (12%)";
-                riskValue.style.color = "var(--success)";
-                rulValue.innerText = "ประมาณ 180 วัน (~9,000 กม.)";
-                
-                partValue.innerText = "ไม่มี (ปกติทุกชิ้นส่วน)";
-                partValue.className = "badge";
-                partValue.style.backgroundColor = "rgba(16, 185, 129, 0.2)";
-                partValue.style.color = "var(--success)";
-
-                recommendValue.innerText = "เข้าตรวจเช็กตามระยะปกติ";
+            if (dangerItems.length === 0) {
+                container.innerHTML = `<p class="text-sm text-slate-400 py-4 text-center">🎉 ไม่พบรายการวิกฤตในขณะนี้</p>`;
+                return;
             }
+
+            dangerItems.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center justify-between';
+                div.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold text-white">${item.name} (เสี่ยงวิกฤต)</h4>
+                            <p class="text-xs text-slate-400">อุณหภูมิ: ${item.temp}°C | แรงดันน้ำมัน: ${item.oil} PSI | RUL เหลือเพียง ${item.rulHours} ชั่วโมง</p>
+                        </div>
+                    </div>
+                    <span class="text-xs text-slate-500">${item.date}</span>
+                `;
+                container.appendChild(div);
+            });
         }
+
+        // สั่งทำงานเมื่อโหลดหน้าเว็บครั้งแรก
+        window.onload = function() {
+            renderHistoryTable();
+        };
     </script>
 </body>
 </html>
