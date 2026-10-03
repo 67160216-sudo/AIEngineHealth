@@ -6,6 +6,10 @@
 <img width="1376" height="768" alt="6fe890cf-a2d5-4d85-877c-18ef42d2f113" src="https://github.com/user-attachments/assets/d408ab0d-0d0d-4389-96bf-2f161a965411" />
 
 
+
+
+<img width="806" height="691" alt="image" src="https://github.com/user-attachments/assets/aa31672f-e099-463e-8d97-72fa201287b4" />
+
 # 🚗 AI Engine Health Prediction REST API & Simulation Web App
 
 ระบบ REST API และเว็บแอปพลิเคชันจำลองการทำนายสุขภาพเครื่องยนต์รถยนต์ล่วงหน้าด้วย AI (Predictive Maintenance) สำหรับโปรเจกต์รายวิชา โดยใช้ **FastAPI** ร่วมกับ **Docker & Docker Compose** ตามมาตรฐานการพัฒนาซอฟต์แวร์
