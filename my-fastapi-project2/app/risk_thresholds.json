@@ -1,0 +1,7 @@
+{
+  "warning": 55.2,
+  "danger": 74.6,
+  "method": "percentile 75/95 of healthy engines (5-fold out-of-fold risk)",
+  "healthy_flagged_warning_pct": 25.0,
+  "faulty_caught_warning_pct": 54.1
+}

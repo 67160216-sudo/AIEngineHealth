@@ -1,0 +1,52 @@
+nohup: ignoring input
+scikit-learn 1.4.2 | numpy 1.26.4 | pandas 3.0.6
+
+📂 โหลดข้อมูล 19,535 แถว
+   ค่าว่าง: 0 | แถวซ้ำ: 0
+
+📊 สัดส่วนคลาส:
+   0 (ปกติ): 7,218 (36.9%)
+   1 (ผิดปกติ): 12,317 (63.1%)
+   👉 Baseline (ทายคลาสที่เยอะที่สุดตลอด) = 63.1%  โมเดลต้องดีกว่านี้
+
+🔎 ค่าเฉลี่ยแต่ละคลาส (ใช้เช็กว่า label ผิดปกติถูกฝั่งไหม):
+engine_condition       0       1
+engine_rpm        885.00  736.30
+lub_oil_pressure    3.22    3.35
+fuel_pressure       6.24    6.90
+coolant_pressure    2.37    2.32
+lub_oil_temp       78.02   77.42
+coolant_temp       78.80   78.21
+
+🤖 เปรียบเทียบโมเดล (5-Fold CV, ROC-AUC):
+   LogisticRegression     AUC = 0.689 ± 0.014
+   RandomForest           AUC = 0.696 ± 0.012
+   HistGradientBoosting   AUC = 0.693 ± 0.012
+   🏆 เลือก: RandomForest
+
+📈 ผลบน Test set:
+   Accuracy : 0.652  (baseline 0.631)
+   F1 (ผิดปกติ): 0.703
+   ROC-AUC  : 0.697
+   Confusion Matrix [[ปกติ→ปกติ, ปกติ→ผิดปกติ], [ผิดปกติ→ปกติ, ผิดปกติ→ผิดปกติ]]:
+   [[936, 508], [853, 1610]]
+              precision    recall  f1-score   support
+
+        ปกติ      0.523     0.648     0.579      1444
+     ผิดปกติ      0.760     0.654     0.703      2463
+
+    accuracy                          0.652      3907
+   macro avg      0.642     0.651     0.641      3907
+weighted avg      0.673     0.652     0.657      3907
+
+
+💾 บันทึก engine_model.pkl และ model_info.json แล้ว
+🧪 ทดสอบด้วยค่ากลาง -> ความเสี่ยงผิดปกติ 55.5%
+
+📏 ช่วงค่าของข้อมูล (ไว้ใช้ทำฟอร์มหน้าเว็บ):
+   engine_rpm         min=61.0       median=746.0      max=2239.0
+   lub_oil_pressure   min=0.003      median=3.162      max=7.266
+   fuel_pressure      min=0.003      median=6.202      max=21.138
+   coolant_pressure   min=0.002      median=2.167      max=7.479
+   lub_oil_temp       min=71.322     median=76.817     max=89.581
+   coolant_temp       min=61.673     median=78.347     max=195.528

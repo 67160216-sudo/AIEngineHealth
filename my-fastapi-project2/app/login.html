@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบ - AIEngineHealth</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="theme.css?v=20261003" rel="stylesheet">
+</head>
+<body>
+<div class="auth-wrap">
+    <div class="plate auth-card">
+
+        <aside class="auth-side">
+            <div class="brand">
+                <div class="brand-mark"><i class="fa-solid fa-gears"></i></div>
+                <span class="brand-name">AIEngineHealth</span>
+            </div>
+
+            <div>
+                <h1>ตรวจสุขภาพเครื่องยนต์ก่อนพังกลางทาง</h1>
+                <p class="muted">กรอกค่าจากเซนเซอร์ แล้วให้ AI ร่วมกับหลักวิศวกรรมยานยนต์ประเมินว่าเครื่องยนต์มีความเสี่ยงแค่ไหน</p>
+            </div>
+
+            <ul class="spec-list">
+                <li><i class="fa-solid fa-gauge-high"></i>วัดจากค่าเซนเซอร์ 6 ตัว ทั้งแรงดันและอุณหภูมิ</li>
+                <li><i class="fa-solid fa-microchip"></i>AI ประเมินความเสี่ยงเป็นเปอร์เซ็นต์</li>
+                <li><i class="fa-solid fa-screwdriver-wrench"></i>ตรวจซ้ำด้วยเกณฑ์ช่างพร้อมบอกเหตุผล</li>
+                <li><i class="fa-solid fa-clipboard-list"></i>เก็บประวัติการตรวจของรถแต่ละคัน</li>
+            </ul>
+        </aside>
+
+        <main class="auth-main">
+            <h2 style="font-size:24px">เข้าสู่ระบบ</h2>
+            <p class="muted small" style="margin-bottom:24px">ใช้ชื่อผู้ใช้หรืออีเมลที่ลงทะเบียนไว้</p>
+
+            <form id="loginForm" novalidate>
+                <div class="field">
+                    <label for="username">ชื่อผู้ใช้ หรือ อีเมล</label>
+                    <div class="input-wrap">
+                        <i class="fa-solid fa-user icon"></i>
+                        <input type="text" id="username" class="input with-icon" autocomplete="username" required>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="password">รหัสผ่าน</label>
+                    <div class="input-wrap">
+                        <i class="fa-solid fa-lock icon"></i>
+                        <input type="password" id="password" class="input with-icon" autocomplete="current-password" required>
+                    </div>
+                </div>
+
+                <div id="errorMsg" class="alert error hidden" role="alert" style="margin-bottom:14px"></div>
+
+                <button type="submit" id="submitBtn" class="btn btn-primary btn-block">
+                    <i class="fa-solid fa-right-to-bracket"></i>เข้าสู่ระบบ
+                </button>
+            </form>
+
+            <p class="small muted" style="margin-top:24px; text-align:center">
+                ยังไม่มีบัญชี? <a href="register.html">ลงทะเบียน</a>
+            </p>
+        </main>
+    </div>
+</div>
+
+<script>
+const form = document.getElementById('loginForm');
+const errorMsg = document.getElementById('errorMsg');
+const btn = document.getElementById('submitBtn');
+
+function showError(msg) {
+    errorMsg.textContent = msg;
+    errorMsg.classList.remove('hidden');
+}
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorMsg.classList.add('hidden');
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;   // ไม่ตัดช่องว่างรหัสผ่าน
+    if (!username || !password) {
+        showError('กรอกชื่อผู้ใช้และรหัสผ่านให้ครบ');
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>กำลังตรวจสอบ...';
+
+    try {
+        const res = await fetch('login_proxy.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password }),
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+            const u = data.user || data;
+            localStorage.setItem('user_id', u.id || u.user_id);
+            localStorage.setItem('username', u.username);
+            localStorage.setItem('full_name', u.full_name || u.username);
+            window.location.href = 'prediction.html';
+        } else {
+            showError(data.detail || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
+        }
+    } catch (err) {
+        showError('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ลองใหม่อีกครั้ง');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i>เข้าสู่ระบบ';
+    }
+});
+</script>
+</body>
+</html>
