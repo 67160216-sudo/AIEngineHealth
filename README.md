@@ -3,10 +3,6 @@
 
 <img width="1376" height="768" alt="c61669af-f6c4-4a80-b7dd-fb54c5ecffa4" src="https://github.com/user-attachments/assets/5b8d0007-98d2-4e9b-8c80-015bb0c36b40" />
 
-<img width="1376" height="768" alt="6fe890cf-a2d5-4d85-877c-18ef42d2f113" src="https://github.com/user-attachments/assets/d408ab0d-0d0d-4389-96bf-2f161a965411" />
-
-
-
 
 <img width="806" height="691" alt="image" src="https://github.com/user-attachments/assets/aa31672f-e099-463e-8d97-72fa201287b4" />
 
