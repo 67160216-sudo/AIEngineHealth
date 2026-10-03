@@ -1,0 +1,84 @@
+{
+  "features": [
+    "engine_rpm",
+    "lub_oil_pressure",
+    "fuel_pressure",
+    "coolant_pressure",
+    "lub_oil_temp",
+    "coolant_temp"
+  ],
+  "risk_thresholds": {
+    "warning": 40.0,
+    "danger": 70.0
+  },
+  "feature_stats": {
+    "engine_rpm": {
+      "min": 61.0,
+      "p01": 380.0,
+      "median": 746.0,
+      "p99": 1565.0,
+      "max": 2239.0
+    },
+    "lub_oil_pressure": {
+      "min": 0.003,
+      "p01": 0.858,
+      "median": 3.162,
+      "p99": 5.597,
+      "max": 7.266
+    },
+    "fuel_pressure": {
+      "min": 0.003,
+      "p01": 1.38,
+      "median": 6.202,
+      "p99": 16.13,
+      "max": 21.138
+    },
+    "coolant_pressure": {
+      "min": 0.002,
+      "p01": 0.73,
+      "median": 2.167,
+      "p99": 5.945,
+      "max": 7.479
+    },
+    "lub_oil_temp": {
+      "min": 71.322,
+      "p01": 73.413,
+      "median": 76.817,
+      "p99": 87.37,
+      "max": 89.581
+    },
+    "coolant_temp": {
+      "min": 61.673,
+      "p01": 65.74,
+      "median": 78.347,
+      "p99": 91.783,
+      "max": 195.528
+    }
+  },
+  "metrics": {
+    "model": "RandomForest",
+    "baseline_accuracy": 0.6305,
+    "cv_roc_auc": {
+      "LogisticRegression": 0.6886,
+      "RandomForest": 0.6964,
+      "HistGradientBoosting": 0.6933
+    },
+    "test_accuracy": 0.6517,
+    "test_f1_faulty": 0.7029,
+    "test_roc_auc": 0.6973,
+    "confusion_matrix": [
+      [
+        936,
+        508
+      ],
+      [
+        853,
+        1610
+      ]
+    ]
+  },
+  "original_faulty_label": 1,
+  "sklearn_version": "1.4.2",
+  "numpy_version": "1.26.4",
+  "trained_at": "2026-10-02T19:50:34"
+}
