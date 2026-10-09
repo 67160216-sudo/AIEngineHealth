@@ -35,6 +35,8 @@
    - หน้า Login, Register และ Prediction UI สำหรับสาธิตการใช้งาน
    - รองรับ **Sensor Simulator (Preset Buttons)** เพื่อจำลองสถานการณ์รถปกติ / เฝ้าระวัง / เครื่องยนต์เสี่ยงพัง สำหรับนำเสนอสไลด์งาน
 
+
+dataset https://www.kaggle.com/datasets/parvmodi/automotive-vehicles-engine-health-dataset
 ---
 
 ## 📁 โครงสร้างโปรเจกต์ (Project Structure)
