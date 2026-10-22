@@ -47,7 +47,29 @@ my-fastapi-project/
 │   ├── main.py
 │   ├── database.py
 │   ├── models.py
-│   └── static/
+│   ├── api_log.txt
+│   ├── calibrate_thresholds.py
+│   ├── check_model.py
+│   ├── convert_model.py
+│   ├── engine_ai.py
+│   ├── engine_model (1).pkl
+│   ├── history_proxy.php
+│   ├── login_proxy.php
+│   ├── model_info.json
+│   ├── predict_proxy.php
+│   ├── register_proxy.php
+│   ├── risk_thresholds.json
+│   ├── simulate_proxy.php
+│   ├── train_engine_model.py
+│   ├── train_log.txt
+│   ├── dea.html
+│   ├── login.html
+│   ├── prediction.html
+│   ├── register.html
+│   ├── simulation.html
+│   └── theme.css
+│   └── ...
+│
 ├── Dockerfile
 ├── docker-compose.yml
 └── requirements.txt
